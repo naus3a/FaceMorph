@@ -23,6 +23,7 @@ void testApp::setup(){
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
     ofSetWindowTitle("FaceMorph");
+	ofEnableSmoothing();
     
     ofAddListener(mainMenu.gui->newGUIEvent, this, &testApp::onMenuEvent);
     ofAddListener(faceMaker.gui->newGUIEvent, this, &testApp::onFaceEvent);

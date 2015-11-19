@@ -22,6 +22,7 @@
 #include "IState.h"
 #include "Morph.h"
 #include "Clone.h"
+#include "FaceMask.h"
 #include "NauTimer.h"
 
 class MorphPlayer : public IState{
@@ -57,6 +58,7 @@ public:
     NauTimer timer;
     Morph morph;
     Clone clone;
+	FaceMask mask;
     ofFbo fboSrc;
     ofFbo fboMsk;
     
@@ -65,9 +67,11 @@ public:
     ofxUILabelButton * butStart;
     ofxUILabelButton * butStop;
     ofxUILabelButton * butReset;
+	ofxUILabelToggle * togMask;
     ofxUILabel * labStatus;
     
     string reportName;
     const int minStr;
     const int maxStr;
+	bool bMask;
 };

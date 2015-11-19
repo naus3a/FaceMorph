@@ -31,6 +31,7 @@ void Morph::clear(){
     faceDst.clear();
     srcPts.clear();
     time = 1.0;
+	str = 25;
 }
 
 bool Morph::loadSrcImg(){
@@ -73,14 +74,21 @@ void Morph::save(string pth){
     
     xml.addTag("time");
     xml.setValue("time", time);
-    
+
+	xml.addTag("strength");
+    xml.setValue("strength",str);
+
     xml.popTag();
     
     xml.save(pth);
 }
 
 void Morph::load(){
-    ofFileDialogResult dr = ofSystemLoadDialog("morphs/", "Load Morph");
+#ifdef TARGET_WIN32
+    ofFileDialogResult dr = ofSystemLoadDialog("Load Morph");
+#else
+	ofFileDialogResult dr = ofSystemLoadDialog("morphs/", "Load Morph");
+#endif
     if(dr.bSuccess){
         load(dr.getPath());
     }
@@ -96,6 +104,7 @@ void Morph::load(string pth){
                 pthSrc = xml.getValue("src", "");
                 pthDst = xml.getValue("dst", "");
                 time = xml.getValue("time", 1.0);
+				str = xml.getValue("strength",25);
                 xml.popTag();
                 faceSrc.load(pthSrc);
                 faceDst.load(pthDst);

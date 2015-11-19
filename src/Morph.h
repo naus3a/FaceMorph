@@ -40,4 +40,5 @@ public:
     string pthDst;
     float time;
     vector<ofVec2f> srcPts;
+	int str;
 };

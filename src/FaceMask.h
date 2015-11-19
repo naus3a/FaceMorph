@@ -1,5 +1,5 @@
 //
-//  MainMenu.h
+//  Facemask.h
 //  FaceMorph
 //
 // author Enrico <naus3a> Viola 2015
@@ -19,16 +19,21 @@
 //along with FaceMorph.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
-#include "IState.h"
+#include "ofMain.h"
 
-class MainMenu : public IState{
+class FaceMask{
 public:
-    MainMenu();
-    void enter() override;
-    void update() override {};
-    void draw() override {};
-    
-    ofxUILabelButton * butMakeFace;
-    ofxUILabelButton * butMorphSetup;
-    ofxUILabelButton * butMorph;
+	FaceMask();
+	~FaceMask();
+	void linkMesh(ofMesh * _msh, float w, float h);
+	void draw();
+	inline bool isReady(){return bReady;}
+
+protected:
+	ofShader shdMsk;
+	ofFbo fboMask;
+	ofMesh * faceMesh;
+	ofVec2f ctr;
+	ofVec2f radia;
+	bool bReady;
 };

@@ -42,4 +42,5 @@ public:
     ofxUILabelButton * butSave;
     ofxUILabelButton * butLoad;
     ofxUINumberDialer * nuTime;
+	ofxUIIntSlider * sliStr;
 };

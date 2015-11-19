@@ -31,6 +31,8 @@ MorphSetup::MorphSetup(){
     gui->addWidgetDown(butDst);
     nuTime = new ofxUINumberDialer(0.5, 60.0, &morph.time, 2, "seconds", OFX_UI_FONT_MEDIUM);
     gui->addWidgetDown(nuTime);
+	sliStr = new ofxUIIntSlider("strength",0,100,&morph.str, 150,10);
+	gui->addWidgetDown(sliStr);
     butSave = new ofxUILabelButton("Save",false);
     gui->addWidgetDown(butSave);
     butLoad = new ofxUILabelButton("Load", false);

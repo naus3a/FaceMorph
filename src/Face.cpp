@@ -34,8 +34,12 @@ void Face::clear(){
 
 bool Face::loadImage(){
     bool b = false;
-    ofFileDialogResult dr = ofSystemLoadDialog("img/","Load Image");
-    if(dr.bSuccess){
+#ifdef TARGET_WIN32
+    ofFileDialogResult dr = ofSystemLoadDialog("Load Image", false); //("img/","Load Image");
+#else
+	ofFileDialogResult dr = ofSystemLoadDialog("img/","Load Image");
+#endif
+	if(dr.bSuccess){
         b = loadImage(dr.getPath());
     }
     return b;
@@ -56,8 +60,12 @@ bool Face::loadImage(string pth){
 
 bool Face::load(){
     bool b = false;
-    ofFileDialogResult dr = ofSystemLoadDialog("faces/","Load Face");
-    if(dr.bSuccess){
+#ifdef TARGET_WIN32
+    ofFileDialogResult dr = ofSystemLoadDialog("Load Face",false);//("faces/","Load Face");
+#else
+	ofFileDialogResult dr = ofSystemLoadDialog("faces/","Load Face");
+#endif
+	if(dr.bSuccess){
         b = load(dr.getPath());
         tmpPth = dr.getPath();
     }
@@ -129,8 +137,12 @@ void Face::save(){
         }else{
             pth = "new_face.face";
         }
-        ofFileDialogResult dr = ofSystemSaveDialog(pth, "Save Face");
-        if(dr.bSuccess){
+#ifdef TARGET_WIN32
+		ofFileDialogResult dr = ofSystemSaveDialog("new_face.face", "Save Face"); //ofSystemSaveDialog(pth, "Save Face");
+#else
+		ofFileDialogResult dr = ofSystemSaveDialog(pth, "Save Face");
+#endif
+		if(dr.bSuccess){
             save(dr.getPath());
         }
     }

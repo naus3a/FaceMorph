@@ -23,10 +23,13 @@
 MorphPlayer::MorphPlayer() : minStr(0), maxStr(25){
     timer.addListener(this, &MorphPlayer::onNaturalStop);
     float ww = 200;
+	bMask = true;
     gui = new ofxUICanvas(ofGetWidth()-ww,0,ww,ofGetHeight());
     gui->addWidgetDown(new ofxUILabel("Morph", OFX_UI_FONT_LARGE));
     butLoad = new ofxUILabelButton("Load",false);
     gui->addWidgetDown(butLoad);
+	togMask = new ofxUILabelToggle("Use Mask", &bMask);
+	gui->addWidgetDown(togMask);
     gui->addSpacer();
     butReset = new ofxUILabelButton("Reset", false);
     gui->addWidgetDown(butReset);
@@ -52,6 +55,7 @@ void MorphPlayer::enter(){
     gui->setVisible(true);
     ofAddListener(ofEvents().keyPressed , this, &MorphPlayer::onKeyPressed);
     makeReportName();
+	bMask = true;
 }
 
 void MorphPlayer::exit(){
@@ -109,24 +113,16 @@ void MorphPlayer::saveReport(MorphPlayer::TestArgs ta){
 void MorphPlayer::update(){
     if(timer.bRunning){
         timer.update();
-        updateClone(ofMap(timer.getPct(), 0, 1, minStr, maxStr));
+		updateClone(ofMap(timer.getPct(), 0, 1, minStr, morph.str));
     }
 }
 
 void MorphPlayer::draw(){
     if(morph.isReady()){
-        /*morph.faceSrc.img.draw(0,0);
-        ofMesh msh = morph.faceSrc.msh;
-        msh.clearTexCoords();
-        for(int i=0;i<msh.getNumVertices();i++){
-            msh.addTexCoord(ofVec2f(morph.faceDst.msh.getVertex(i).x,morph.faceDst.msh.getVertex(i).y));
-        }
-        
-        morph.faceDst.img.bind();
-        msh.drawFaces();
-        morph.faceDst.img.unbind();*/
-        clone.draw(0, 0);
-
+		clone.draw(0, 0);
+		if(bMask){
+			mask.draw();
+		}
     }
 }
 
@@ -165,12 +161,17 @@ void MorphPlayer::load(){
         
         timer.setup(morph.time, 1);
         labStatus->setLabel("IDLE");
+
+		mask.linkMesh(&morph.faceSrc.msh, morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight());
     }
+	bMask = true;
 }
 
 void MorphPlayer::updateClone(float str){
-    clone.setStrength(str);
-    clone.update(fboSrc.getTextureReference(), morph.faceSrc.img.getTextureReference(), fboMsk.getTextureReference());
+	if(morph.isReady()){
+		clone.setStrength(str);
+		clone.update(fboSrc.getTextureReference(), morph.faceSrc.img.getTextureReference(), fboMsk.getTextureReference());
+	}
 }
 
 void MorphPlayer::start(){
