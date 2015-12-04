@@ -27,6 +27,7 @@ Morph::Morph(){
 void Morph::clear(){
     pthSrc="";
     pthDst="";
+    fileName="";
     faceSrc.clear();
     faceDst.clear();
     srcPts.clear();
@@ -99,6 +100,7 @@ void Morph::load(string pth){
         ofxXmlSettings xml;
         if(xml.load(pth)){
             clear();
+            fileName=pth;
             if(xml.tagExists("morph")){
                 xml.pushTag("morph");
                 pthSrc = xml.getValue("src", "");

@@ -141,7 +141,15 @@ void testApp::onMorph(ofxUIEventArgs &e){
         if(mPlayer.butReset->getValue()){
             mPlayer.reset();
         }
+    }else if(e.widget==mPlayer.butVideo){
+        if(mPlayer.butVideo->getValue()){
+            mPlayer.startRecord();
+        }
     }
+}
+
+void testApp::exit(){
+    mPlayer.close();
 }
 
 //--------------------------------------------------------------

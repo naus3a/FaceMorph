@@ -24,6 +24,7 @@
 #include "Clone.h"
 #include "FaceMask.h"
 #include "NauTimer.h"
+#include "ofxMovieExporter.h"
 
 class MorphPlayer : public IState{
 public:
@@ -51,9 +52,15 @@ public:
     void start();
     void stop();
     void reset();
+    void startRecord();
     
     void onNaturalStop(int & tick);
     void onKeyPressed(ofKeyEventArgs & e);
+    
+    void close();
+    bool isContainerSupported(string ext);
+    
+    Apex::ofxMovieExporter recorder;
     
     NauTimer timer;
     Morph morph;
@@ -68,7 +75,10 @@ public:
     ofxUILabelButton * butStop;
     ofxUILabelButton * butReset;
 	ofxUILabelToggle * togMask;
+    ofxUILabelButton * butVideo;
     ofxUILabel * labStatus;
+    
+    ofVec2f szMorph;
     
     string reportName;
     const int minStr;

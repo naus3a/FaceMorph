@@ -24,6 +24,7 @@ MorphPlayer::MorphPlayer() : minStr(0), maxStr(25){
     timer.addListener(this, &MorphPlayer::onNaturalStop);
     float ww = 200;
 	bMask = true;
+    //recorder.setup();
     gui = new ofxUICanvas(ofGetWidth()-ww,0,ww,ofGetHeight());
     gui->addWidgetDown(new ofxUILabel("Morph", OFX_UI_FONT_LARGE));
     butLoad = new ofxUILabelButton("Load",false);
@@ -37,6 +38,8 @@ MorphPlayer::MorphPlayer() : minStr(0), maxStr(25){
     gui->addWidgetDown(butStart);
     butStop =  new ofxUILabelButton("Stop", false);
     gui->addWidgetDown(butStop);
+    butVideo = new ofxUILabelButton("Record Video", false);
+    gui->addWidgetDown(butVideo);
     gui->addWidgetDown(new ofxUILabel("[space bar] to stop", OFX_UI_FONT_SMALL));
     gui->addSpacer();
     gui->addWidgetDown(new ofxUILabel("Status:", OFX_UI_FONT_MEDIUM));
@@ -46,6 +49,16 @@ MorphPlayer::MorphPlayer() : minStr(0), maxStr(25){
     butBack = new ofxUILabelButton("Main Menu", false);
     gui->addWidgetDown(butBack);
     gui->setVisible(false);
+}
+
+bool MorphPlayer::isContainerSupported(string ext){
+    ostringstream oss;
+    oss<<"amovie."<<ext;
+    AVOutputFormat * of;
+    of = av_guess_format(NULL, oss.str().c_str(), NULL);
+    bool b = of;
+    delete of;
+    return b;
 }
 
 void MorphPlayer::enter(){
@@ -189,12 +202,35 @@ void MorphPlayer::stop(){
         labStatus->setLabel("IDLE");
         saveReport(ta);
     }
+    
+    if(recorder.isRecording()){
+        recorder.stop();
+    }
 }
 
 void MorphPlayer::reset(){
     timer.stop();
     timer.reset();
     updateClone(0);
+}
+
+void MorphPlayer::startRecord(){
+    if(morph.isReady() && !recorder.isRecording()){
+        string vidName = "";
+        if(morph.fileName!=""){
+            vidName = ofFilePath::getBaseName(morph.fileName);
+        }else{
+            vidName = "vid";
+        }
+        recorder.setup(morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight(),
+                       recorder.BIT_RATE, recorder.FRAME_RATE, recorder.CODEC_ID,
+                       recorder.CONTAINER);
+        recorder.setRecordingArea(0, 0, morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight());
+        recorder.record(vidName);
+        timer.reset();
+        timer.start();
+        labStatus->setLabel("RECORDING...");
+    }
 }
 
 void MorphPlayer::onNaturalStop(int &tick){
@@ -205,4 +241,10 @@ void MorphPlayer::onKeyPressed(ofKeyEventArgs & e){
     if(e.key==' '){
         stop();
     }
+}
+
+void MorphPlayer::close(){
+#ifdef _THREAD_CAPTURE
+    recorder.waitForThread();
+#endif
 }

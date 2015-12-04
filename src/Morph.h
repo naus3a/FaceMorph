@@ -38,6 +38,7 @@ public:
     Face faceDst;
     string pthSrc;
     string pthDst;
+    string fileName;
     float time;
     vector<ofVec2f> srcPts;
 	int str;

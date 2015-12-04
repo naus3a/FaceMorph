@@ -37,6 +37,7 @@ class testApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+    void exit();
     
     void goState(AppState as, bool bExit=true);
     void onMenuEvent(ofxUIEventArgs & e);
