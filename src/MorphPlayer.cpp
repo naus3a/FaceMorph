@@ -224,7 +224,11 @@ void MorphPlayer::startRecord(){
         }
         recorder.setup(morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight(),
                        recorder.BIT_RATE, recorder.FRAME_RATE, recorder.CODEC_ID,
+#ifdef TARRGET_WIN32
+                       "avi");
+#else
                        recorder.CONTAINER);
+#endif
         recorder.setRecordingArea(0, 0, morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight());
         recorder.record(vidName);
         timer.reset();
