@@ -49,8 +49,15 @@ MorphPlayer::MorphPlayer() : minStr(0), maxStr(25){
     butBack = new ofxUILabelButton("Main Menu", false);
     gui->addWidgetDown(butBack);
     gui->setVisible(false);
+
+#ifdef TARGET_WIN32
+	recorder.setFfmpegLocation("C:\\ffmpeg\\bin\\ffmpeg");
+	recorder.setMovFileExtension(".avi");
+	bRec = false;
+#endif
 }
 
+#ifndef TARGET_WIN32
 bool MorphPlayer::isContainerSupported(string ext){
     ostringstream oss;
     oss<<"amovie."<<ext;
@@ -60,6 +67,7 @@ bool MorphPlayer::isContainerSupported(string ext){
     delete of;
     return b;
 }
+#endif
 
 void MorphPlayer::enter(){
     ofSetWindowShape(1024, 768);
@@ -69,6 +77,9 @@ void MorphPlayer::enter(){
     ofAddListener(ofEvents().keyPressed , this, &MorphPlayer::onKeyPressed);
     makeReportName();
 	bMask = true;
+#ifdef TARGET_WIN32
+	bRec=false;
+#endif
 }
 
 void MorphPlayer::exit(){
@@ -132,10 +143,24 @@ void MorphPlayer::update(){
 
 void MorphPlayer::draw(){
     if(morph.isReady()){
+#ifdef TARGET_WIN32
+		fboOutput.begin();
+		ofClear(0,0,0);
+#endif
 		clone.draw(0, 0);
 		if(bMask){
 			mask.draw();
 		}
+#ifdef TARGET_WIN32
+		fboOutput.end();
+		fboOutput.draw(0,0);
+
+		if(recorder.isRecording()){
+			ofPixels pix;
+			fboOutput.readToPixels(pix);
+			recorder.addFrame(pix);
+		}
+#endif
     }
 }
 
@@ -176,6 +201,13 @@ void MorphPlayer::load(){
         labStatus->setLabel("IDLE");
 
 		mask.linkMesh(&morph.faceSrc.msh, morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight());
+
+#ifdef TARGET_WIN32
+		fboOutput.allocate(morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight(), GL_RGB);
+		fboOutput.begin();
+		ofClear(0,0,0);
+		fboOutput.end();
+#endif
     }
 	bMask = true;
 }
@@ -202,10 +234,16 @@ void MorphPlayer::stop(){
         labStatus->setLabel("IDLE");
         saveReport(ta);
     }
-    
+
+#ifdef TARGET_WIN32
+	if(bRec){
+		recorder.close();
+	}
+#else
     if(recorder.isRecording()){
         recorder.stop();
     }
+#endif
 }
 
 void MorphPlayer::reset(){
@@ -215,23 +253,30 @@ void MorphPlayer::reset(){
 }
 
 void MorphPlayer::startRecord(){
+#ifdef TARGET_WIN32
+	if(morph.isReady() && !bRec){
+#else
     if(morph.isReady() && !recorder.isRecording()){
-        string vidName = "";
+#endif
+		string vidName = "";
         if(morph.fileName!=""){
             vidName = ofFilePath::getBaseName(morph.fileName);
         }else{
             vidName = "vid";
         }
+#ifdef TARGET_WIN32
+		recorder.setup(vidName,morph.faceSrc.img.getWidth(),morph.faceSrc.img.getHeight(),30);
+		recorder.start();
+		bRec = true;
+#else
         recorder.setup(morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight(),
                        recorder.BIT_RATE, recorder.FRAME_RATE, recorder.CODEC_ID,
-#ifdef TARRGET_WIN32
-                       "avi");
-#else
                        recorder.CONTAINER);
-#endif
+
         recorder.setRecordingArea(0, 0, morph.faceSrc.img.getWidth(), morph.faceSrc.img.getHeight());
         recorder.record(vidName);
-        timer.reset();
+#endif
+		timer.reset();
         timer.start();
         labStatus->setLabel("RECORDING...");
     }
@@ -251,4 +296,6 @@ void MorphPlayer::close(){
 #ifdef _THREAD_CAPTURE
     recorder.waitForThread();
 #endif
+
+
 }

@@ -24,7 +24,11 @@
 #include "Clone.h"
 #include "FaceMask.h"
 #include "NauTimer.h"
+#ifdef TARGET_WIN32
+#include "ofxVideoRecorder.h"
+#else
 #include "ofxMovieExporter.h"
+#endif
 
 class MorphPlayer : public IState{
 public:
@@ -58,10 +62,17 @@ public:
     void onKeyPressed(ofKeyEventArgs & e);
     
     void close();
+#ifndef TARGET_WIN32
     bool isContainerSupported(string ext);
-    
+#endif
+
+#ifdef TARGET_WIN32
+	ofxVideoRecorder recorder;
+	ofFbo fboOutput;
+	bool bRec;
+#else
     Apex::ofxMovieExporter recorder;
-    
+#endif
     NauTimer timer;
     Morph morph;
     Clone clone;
